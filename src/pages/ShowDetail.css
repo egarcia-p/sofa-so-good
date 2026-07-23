@@ -1,0 +1,323 @@
+/* src/pages/ShowDetail.css */
+.show-detail-page {
+  min-height: 100dvh;
+  padding-bottom: calc(var(--nav-bottom-total) + var(--space-6));
+  overflow-y: auto;
+}
+
+.show-backdrop {
+  height: 220px;
+  background: var(--color-bg-elevated);
+  background-size: cover;
+  background-position: center top;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.show-backdrop-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 6, 24, 0.4) 0%,
+    rgba(13, 6, 24, 0.95) 100%
+  );
+}
+
+.back-btn {
+  position: absolute;
+  top: calc(var(--safe-top) + 12px);
+  left: var(--space-4);
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: rgba(13, 6, 24, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  font-size: 1.4rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all var(--transition-fast);
+}
+
+.back-btn:active { transform: scale(0.9); }
+
+.show-content {
+  padding: 0 var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: -48px;
+  position: relative;
+  z-index: 1;
+}
+
+.show-header {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+}
+
+.show-poster-wrap {
+  flex-shrink: 0;
+}
+
+.show-poster {
+  width: 90px;
+  height: 135px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.show-poster-placeholder {
+  width: 90px;
+  height: 135px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.show-meta {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 4px;
+}
+
+.show-title {
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.show-year {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.show-rating {
+  font-size: 0.78rem;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+.show-next-ep {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent-light);
+  color: var(--color-accent-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid var(--color-border);
+}
+
+.show-next-ep--done {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--color-green);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.show-overview-section {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+}
+
+.show-overview {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.show-next-air {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(236, 72, 153, 0.07));
+}
+
+.show-next-air-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-accent-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.show-next-air-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.show-next-air-info strong {
+  font-size: 0.9rem;
+  color: var(--color-text-primary);
+}
+
+/* Season Tabs */
+.season-tabs-section {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--color-bg-primary);
+  padding: var(--space-2) 0;
+  margin: 0 calc(-1 * var(--space-4));
+  padding: var(--space-2) var(--space-4);
+}
+
+.season-tabs-scroll {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.season-tabs-scroll::-webkit-scrollbar { display: none; }
+
+.season-tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  color: var(--color-text-muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.season-tab--active {
+  background: linear-gradient(135deg, var(--color-accent-primary), var(--color-pink));
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 2px 8px var(--color-accent-glow);
+}
+
+.season-check {
+  font-size: 0.7rem;
+  color: var(--color-green);
+}
+
+.season-tab--active .season-check {
+  color: rgba(255,255,255,0.8);
+}
+
+/* Episodes */
+.episodes-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.episodes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.episode-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-3);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all var(--transition-fast);
+}
+
+.episode-row:active { transform: scale(0.98); }
+.episode-row:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.episode-row--watched {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.episode-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  color: var(--color-text-muted);
+}
+
+.episode-checkbox--checked {
+  background: var(--color-green);
+  border-color: var(--color-green);
+  color: white;
+}
+
+.episode-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.episode-title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.episode-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  background: var(--color-bg-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.episode-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.episode-row--watched .episode-name {
+  color: var(--color-text-secondary);
+}
+
+.episode-date {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+  display: block;
+}

@@ -1,0 +1,60 @@
+/* src/pages/Search.css */
+.search-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.search-heading {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.search-bar-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar-icon {
+  position: absolute;
+  left: var(--space-4);
+  font-size: 1rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-bar-input {
+  padding-left: 2.8rem;
+  padding-right: 2.5rem;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-full);
+}
+
+.search-bar-input:focus {
+  border-radius: var(--radius-full);
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: var(--space-4);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: var(--space-1);
+  line-height: 1;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.search-count {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+}

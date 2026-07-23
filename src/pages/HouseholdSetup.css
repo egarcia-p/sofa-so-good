@@ -1,0 +1,111 @@
+/* src/pages/HouseholdSetup.css */
+.setup-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: var(--space-8) var(--space-4);
+  background: radial-gradient(ellipse at top right, #1e0a50 0%, var(--color-bg-primary) 60%);
+}
+
+.setup-container {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.setup-header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.setup-icon {
+  font-size: 3rem;
+}
+
+.setup-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.setup-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  max-width: 300px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.setup-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.setup-option-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-card);
+}
+
+.setup-option-btn:active {
+  transform: scale(0.97);
+  background: var(--color-bg-elevated);
+}
+
+.setup-option-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.setup-option-title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin-bottom: 2px;
+}
+
+.setup-option-desc {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.setup-option-arrow {
+  font-size: 1.5rem;
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+
+.setup-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.setup-form-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.setup-code-input {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: var(--font-display);
+}

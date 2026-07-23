@@ -1,0 +1,83 @@
+/* src/components/MediaCard.css */
+.media-card {
+  display: flex;
+  gap: var(--space-3);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-card);
+}
+
+.media-card:active {
+  transform: scale(0.97);
+  background: var(--color-bg-elevated);
+}
+
+.media-card__poster {
+  width: 64px;
+  height: 96px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-bg-elevated);
+}
+
+.media-card__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-card__no-poster {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+}
+
+.media-card__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.media-card__title {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+}
+
+.media-card__year {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.media-card__rating {
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.media-card__progress {
+  font-size: 0.82rem;
+  color: var(--color-accent-secondary);
+  font-weight: 600;
+  margin-top: var(--space-1);
+}
+
+.progress--watched {
+  color: var(--color-green);
+}

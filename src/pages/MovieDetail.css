@@ -1,0 +1,185 @@
+/* src/pages/MovieDetail.css */
+.movie-detail-page {
+  min-height: 100dvh;
+  padding-bottom: calc(var(--nav-bottom-total) + var(--space-6));
+  overflow-y: auto;
+}
+
+.movie-backdrop {
+  height: 220px;
+  background: var(--color-bg-elevated);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.movie-backdrop-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(13, 6, 24, 0.3) 0%,
+    rgba(13, 6, 24, 0.95) 100%
+  );
+}
+
+.movie-content {
+  padding: 0 var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: -48px;
+  position: relative;
+  z-index: 1;
+}
+
+.movie-header {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-end;
+}
+
+.movie-poster-wrap { flex-shrink: 0; }
+
+.movie-poster {
+  width: 90px;
+  height: 135px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 2px solid var(--color-border);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+
+.movie-poster-placeholder {
+  width: 90px;
+  height: 135px;
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elevated);
+  border: 2px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.movie-meta { flex: 1; min-width: 0; }
+
+.movie-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.movie-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.movie-year, .movie-runtime {
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}
+
+.movie-rating {
+  font-size: 0.82rem;
+  color: var(--color-gold);
+  font-weight: 600;
+}
+
+.movie-genres {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.movie-overview-section {
+  padding: var(--space-4);
+}
+
+.movie-overview {
+  font-size: 0.88rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.movie-watch-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.movie-watched-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.movie-watched-check {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.movie-watched-label {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-green);
+  margin: 0;
+}
+
+.movie-watched-date {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 2px 0 0;
+}
+
+.movie-unwatched-state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.movie-unwatched-icon { font-size: 1.8rem; }
+
+.movie-unwatched-label {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.movie-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-3);
+}
+
+.movie-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-3);
+  text-align: center;
+}
+
+.movie-info-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.movie-info-value {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.movie-info-sub {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+}

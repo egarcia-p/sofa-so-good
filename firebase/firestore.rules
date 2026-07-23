@@ -1,0 +1,49 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: check if user belongs to this household
+    function isMember(householdId) {
+      return isAuth() &&
+        request.auth.uid in get(/databases/$(database)/documents/households/$(householdId)).data.members;
+    }
+
+    // Users can only read/write their own profile
+    match /users/{userId} {
+      allow read: if isAuth() && (request.auth.uid == userId ||
+        // Household members can read each other's profiles
+        exists(/databases/$(database)/documents/users/$(userId)) &&
+        get(/databases/$(database)/documents/users/$(userId)).data.householdId != null &&
+        get(/databases/$(database)/documents/users/$(userId)).data.householdId ==
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.householdId
+      );
+      allow write: if isAuth() && request.auth.uid == userId;
+    }
+
+    // Households: only members can read/write
+    match /households/{householdId} {
+      // Allow reading for join-by-code (anyone auth'd can query by inviteCode)
+      allow read: if isAuth();
+
+      // Only the creator can create; only existing members can update
+      allow create: if isAuth() &&
+        request.auth.uid in request.resource.data.members;
+      allow update: if isAuth() && (
+        isMember(householdId) ||
+        // Allow joining (adding yourself to members array)
+        request.auth.uid in request.resource.data.members
+      );
+      allow delete: if false;
+
+      // Collection sub-collection: only household members can read/write
+      match /collection/{itemId} {
+        allow read, write: if isMember(householdId);
+      }
+    }
+  }
+}
