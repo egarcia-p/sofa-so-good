@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { subscribeToItem, toggleEpisodeWatched, markSeasonWatched, updateShowMetadata } from '../services/collection';
+import { subscribeToItem, toggleEpisodeWatched, markSeasonWatched, updateShowMetadata, calculateNextEpisode } from '../services/collection';
 import { getTVShow, getTVSeason, posterUrl, backdropUrl } from '../services/tmdb';
 import './ShowDetail.css';
 
@@ -37,12 +37,21 @@ export default function ShowDetail() {
     getTVShow(tmdbId).then(detail => {
       setShowDetail(detail);
       setLoadingDetail(false);
-      // Update metadata in Firestore (next air date, etc.)
-      if (householdId && detail.next_episode_to_air?.air_date) {
+
+      const totalEpisodesPerSeason = detail.seasons
+        ?.filter(s => s.season_number > 0)
+        .reduce((acc, s) => ({ ...acc, [`s${s.season_number}`]: s.episode_count }), {});
+
+      const updatedTotalEp = totalEpisodesPerSeason || item.totalEpisodesPerSeason || {};
+      const newNextEp = calculateNextEpisode(item.watchProgress || {}, detail.number_of_seasons, updatedTotalEp);
+
+      if (householdId) {
         updateShowMetadata(householdId, id, {
-          nextAirDate: detail.next_episode_to_air.air_date,
+          nextAirDate: detail.next_episode_to_air?.air_date || null,
           status: detail.status,
           totalSeasons: detail.number_of_seasons,
+          totalEpisodesPerSeason: updatedTotalEp,
+          nextEpisode: newNextEp,
         }).catch(() => {});
       }
     }).catch(() => setLoadingDetail(false));
@@ -73,7 +82,7 @@ export default function ShowDetail() {
 
   const handleMarkSeasonWatched = async (seasonNum, watched) => {
     const season = seasons[seasonNum];
-    const count = season?.episodes?.length || 0;
+    const count = season?.episodes?.length || item?.totalEpisodesPerSeason?.[`s${seasonNum}`] || 0;
     if (!count) return;
 
     try {
@@ -96,11 +105,20 @@ export default function ShowDetail() {
   const currentSeasonData = seasons[activeSeason];
 
   const isSeasonFullyWatched = (seasonNum) => {
-    const season = seasons[seasonNum];
-    if (!season) return false;
-    const episodes = season.episodes || [];
     const progress = watchProgress[`s${seasonNum}`] || {};
-    return episodes.every(ep => progress[`e${ep.episode_number}`]);
+    const epCount = showDetail?.seasons?.find(s => s.season_number === seasonNum)?.episode_count
+      || item?.totalEpisodesPerSeason?.[`s${seasonNum}`];
+
+    if (epCount && epCount > 0) {
+      for (let ep = 1; ep <= epCount; ep++) {
+        if (!progress[`e${ep}`]) return false;
+      }
+      return true;
+    }
+
+    const season = seasons[seasonNum];
+    if (!season || !season.episodes?.length) return false;
+    return season.episodes.every(ep => progress[`e${ep.episode_number}`]);
   };
 
   const watchedCountInSeason = (seasonNum) => {

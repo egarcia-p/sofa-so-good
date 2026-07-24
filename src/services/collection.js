@@ -49,6 +49,7 @@ export async function addToCollection(householdId, userId, mediaItem) {
     data.status = mediaItem.status || 'Unknown';
     data.nextEpisode = { season: 1, episode: 1 };
     data.watchProgress = {};
+    data.totalEpisodesPerSeason = mediaItem.totalEpisodesPerSeason || {};
     data.nextAirDate = mediaItem.nextAirDate || null;
     data.lastWatchedAt = null;
   }
@@ -129,10 +130,16 @@ export async function markSeasonWatched(householdId, itemId, season, episodeCoun
     [progressKey]: seasonData,
   };
 
-  const nextEpisode = calculateNextEpisode(updatedProgress, data.totalSeasons, data.totalEpisodesPerSeason || {});
+  const updatedTotalEpisodesPerSeason = {
+    ...(data.totalEpisodesPerSeason || {}),
+    [progressKey]: episodeCount,
+  };
+
+  const nextEpisode = calculateNextEpisode(updatedProgress, data.totalSeasons, updatedTotalEpisodesPerSeason);
 
   await updateDoc(ref, {
     watchProgress: updatedProgress,
+    totalEpisodesPerSeason: updatedTotalEpisodesPerSeason,
     nextEpisode,
     lastWatchedAt: serverTimestamp(),
     lastWatchedBy: userId,
@@ -164,14 +171,30 @@ export function subscribeToItem(householdId, itemId, callback) {
 }
 
 // --- Helper: calculate next unwatched episode ---
-function calculateNextEpisode(watchProgress, totalSeasons, totalEpisodesPerSeason) {
-  for (let s = 1; s <= (totalSeasons || 20); s++) {
+export function calculateNextEpisode(watchProgress = {}, totalSeasons = 1, totalEpisodesPerSeason = {}) {
+  for (let s = 1; s <= (totalSeasons || 1); s++) {
     const seasonData = watchProgress[`s${s}`] || {};
-    const epCount = totalEpisodesPerSeason[`s${s}`] || 30; // fallback
+    const epCount = totalEpisodesPerSeason[`s${s}`];
 
-    for (let ep = 1; ep <= epCount; ep++) {
-      if (!seasonData[`e${ep}`]) {
-        return { season: s, episode: ep };
+    if (epCount !== undefined && epCount !== null && epCount > 0) {
+      for (let ep = 1; ep <= epCount; ep++) {
+        if (!seasonData[`e${ep}`]) {
+          return { season: s, episode: ep };
+        }
+      }
+    } else {
+      const episodeKeys = Object.keys(seasonData).filter(k => k.startsWith('e'));
+      const episodeNums = episodeKeys.map(k => parseInt(k.slice(1), 10)).filter(n => !isNaN(n));
+      const maxEpInProgress = episodeNums.length > 0 ? Math.max(...episodeNums) : 0;
+
+      for (let ep = 1; ep <= maxEpInProgress; ep++) {
+        if (!seasonData[`e${ep}`]) {
+          return { season: s, episode: ep };
+        }
+      }
+
+      if (maxEpInProgress === 0) {
+        return { season: s, episode: 1 };
       }
     }
   }
