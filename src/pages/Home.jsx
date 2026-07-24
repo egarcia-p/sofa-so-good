@@ -13,15 +13,17 @@ export default function Home() {
   // Shows with a next episode to watch
   const nextToWatch = shows.filter(s => s.nextEpisode);
 
-  // Shows with upcoming air dates
+  // Shows with upcoming air dates or returning series status
   const upcoming = shows.filter(s => {
-    if (!s.nextAirDate) return false;
-    const airDate = s.nextAirDate?.toDate?.() || new Date(s.nextAirDate);
-    return airDate > new Date();
+    if (s.nextAirDate) {
+      const airDate = s.nextAirDate?.toDate?.() || new Date(s.nextAirDate);
+      return airDate > new Date();
+    }
+    return s.status === 'Returning Series' || s.status === 'In Production' || s.status === 'Planned';
   }).sort((a, b) => {
-    const da = a.nextAirDate?.toDate?.() || new Date(a.nextAirDate);
-    const db_ = b.nextAirDate?.toDate?.() || new Date(b.nextAirDate);
-    return da - db_;
+    const da = a.nextAirDate?.toDate?.() || (a.nextAirDate ? new Date(a.nextAirDate) : new Date('2099-01-01'));
+    const db = b.nextAirDate?.toDate?.() || (b.nextAirDate ? new Date(b.nextAirDate) : new Date('2099-01-01'));
+    return da - db;
   });
 
   // Recently added (top 5)
@@ -135,6 +137,17 @@ export default function Home() {
 function NextWatchCard({ show, onClick }) {
   const poster = posterUrl(show.posterPath, 'w185');
   const { season, episode } = show.nextEpisode;
+  const airDate = show.nextAirDate?.toDate?.() || (show.nextAirDate ? new Date(show.nextAirDate) : null);
+  const formattedNextAir = airDate
+    ? airDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+    : null;
+
+  const statusBadgeClass = show.status === 'Ended' || show.status === 'Canceled'
+    ? 'badge-movie'
+    : show.status === 'Returning Series'
+    ? 'badge-returning'
+    : 'badge-tv';
+
   return (
     <button className="next-watch-card" onClick={onClick} id={`next-watch-${show.id}`}>
       <div className="next-watch-poster">
@@ -146,7 +159,26 @@ function NextWatchCard({ show, onClick }) {
       <div className="next-watch-info">
         <p className="next-watch-show-title">{show.title}</p>
         <p className="next-watch-episode">Season {season} · Episode {episode}</p>
-        {show.status && <span className={`badge ${show.status === 'Ended' ? 'badge-movie' : 'badge-tv'}`}>{show.status}</span>}
+        <div className="next-watch-tags">
+          {show.status && (
+            <span className={`badge ${statusBadgeClass}`}>
+              {show.status}
+            </span>
+          )}
+          {formattedNextAir ? (
+            <span className="tooltip-wrap">
+              <span className="badge badge-tbc">
+                📅 {formattedNextAir}
+              </span>
+              <span className="tooltip-text">To Be Confirmed by network schedule</span>
+            </span>
+          ) : show.status === 'Returning Series' ? (
+            <span className="tooltip-wrap">
+              <span className="badge badge-tbc">Date TBC</span>
+              <span className="tooltip-text">To Be Confirmed — TMDB release date pending</span>
+            </span>
+          ) : null}
+        </div>
       </div>
       <span className="next-watch-play">▶</span>
     </button>
@@ -156,7 +188,8 @@ function NextWatchCard({ show, onClick }) {
 function UpcomingCard({ show, onClick }) {
   const poster = posterUrl(show.posterPath, 'w185');
   const airDate = show.nextAirDate?.toDate?.() || (show.nextAirDate ? new Date(show.nextAirDate) : null);
-  const formattedDate = airDate ? airDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'TBD';
+  const formattedDate = airDate ? airDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null;
+  const nextEpInfo = show.nextEpisodeToAir;
 
   return (
     <button className="upcoming-card" onClick={onClick} id={`upcoming-${show.id}`}>
@@ -168,7 +201,22 @@ function UpcomingCard({ show, onClick }) {
       </div>
       <div className="upcoming-info">
         <p className="upcoming-title">{show.title}</p>
-        <p className="upcoming-date">📅 {formattedDate}</p>
+        <div className="upcoming-details">
+          {nextEpInfo && (
+            <span className="upcoming-ep-label">
+              S{nextEpInfo.seasonNumber} E{nextEpInfo.episodeNumber}{nextEpInfo.name ? `: ${nextEpInfo.name}` : ''}
+            </span>
+          )}
+          <div className="upcoming-date-row">
+            <span className="upcoming-date">
+              📅 {formattedDate || 'Release Date Pending'}
+            </span>
+            <span className="tooltip-wrap">
+              <span className="badge badge-tbc">TBC</span>
+              <span className="tooltip-text">To Be Confirmed — dates subject to network/studio updates</span>
+            </span>
+          </div>
+        </div>
       </div>
     </button>
   );

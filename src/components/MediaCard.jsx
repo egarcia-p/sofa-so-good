@@ -36,10 +36,20 @@ export default function MediaCard({ item, showProgress = true }) {
         )}
       </div>
       <div className="media-card__info">
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <span className={`badge badge-${item.type === 'tv' ? 'tv' : 'movie'}`}>
-            {item.type === 'tv' ? 'TV' : 'Movie'}
+        <div className="flex items-center gap-2 mb-2 flex-wrap">
+          <span className={`badge ${
+            item.type === 'tv'
+              ? (item.status === 'Returning Series' ? 'badge-returning' : item.status === 'Ended' ? 'badge-movie' : 'badge-tv')
+              : 'badge-movie'
+          }`}>
+            {item.type === 'tv' ? (item.status || 'TV') : 'Movie'}
           </span>
+          {item.type === 'tv' && item.status === 'Returning Series' && (
+            <span className="tooltip-wrap">
+              <span className="badge badge-tbc">TBC</span>
+              <span className="tooltip-text">To Be Confirmed by network schedule</span>
+            </span>
+          )}
           {item.rating && (
             <span className="media-card__rating">⭐ {item.rating}</span>
           )}

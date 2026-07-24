@@ -49,6 +49,7 @@
   flex-direction: column;
   justify-content: center;
   gap: var(--space-1);
+  padding-right: var(--space-5);
 }
 
 .media-card__title {

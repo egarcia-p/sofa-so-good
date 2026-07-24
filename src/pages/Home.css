@@ -141,6 +141,14 @@
   font-weight: 600;
 }
 
+.next-watch-tags {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
 .next-watch-play {
   font-size: 1.2rem;
   color: var(--color-accent-primary);
@@ -201,10 +209,31 @@
   text-overflow: ellipsis;
 }
 
+.upcoming-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+.upcoming-ep-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-accent-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upcoming-date-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .upcoming-date {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
-  margin-top: 4px;
 }
 
 /* Recently Added - horizontal scroll */
