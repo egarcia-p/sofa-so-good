@@ -155,7 +155,18 @@ export async function updateShowMetadata(householdId, itemId, updates) {
 export function subscribeToCollection(householdId, callback) {
   const q = query(collectionRef(householdId), orderBy('addedAt', 'desc'));
   return onSnapshot(q, (snapshot) => {
-    const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+    const items = snapshot.docs.map(d => {
+      const data = d.data();
+      const item = { id: d.id, ...data };
+      if (item.type === 'tv') {
+        item.nextEpisode = calculateNextEpisode(
+          item.watchProgress || {},
+          item.totalSeasons || 1,
+          item.totalEpisodesPerSeason || {}
+        );
+      }
+      return item;
+    });
     callback(items);
   }, (error) => {
     console.error('Collection listener error:', error);
@@ -165,8 +176,20 @@ export function subscribeToCollection(householdId, callback) {
 // --- Real-time listener for a single item ---
 export function subscribeToItem(householdId, itemId, callback) {
   return onSnapshot(itemRef(householdId, itemId), (snap) => {
-    if (snap.exists()) callback({ id: snap.id, ...snap.data() });
-    else callback(null);
+    if (snap.exists()) {
+      const data = snap.data();
+      const item = { id: snap.id, ...data };
+      if (item.type === 'tv') {
+        item.nextEpisode = calculateNextEpisode(
+          item.watchProgress || {},
+          item.totalSeasons || 1,
+          item.totalEpisodesPerSeason || {}
+        );
+      }
+      callback(item);
+    } else {
+      callback(null);
+    }
   });
 }
 
