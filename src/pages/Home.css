@@ -155,6 +155,36 @@
   flex-shrink: 0;
 }
 
+/* Mark complete button inside Next to Watch card */
+.mark-complete-btn {
+  margin-top: 6px;
+  padding: 5px 10px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--color-accent-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+  align-self: flex-start;
+}
+
+.mark-complete-btn:hover {
+  background: rgba(124, 58, 237, 0.25);
+  border-color: var(--color-accent-primary);
+  color: white;
+}
+
+.mark-complete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Upcoming */
 .upcoming-list {
   display: flex;

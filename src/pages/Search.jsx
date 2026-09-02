@@ -33,14 +33,21 @@ export default function Search() {
       // Fetch additional metadata for TV shows
       if (isTV) {
         const showDetail = await getTVShow(tmdbItem.id);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const airedSeasons = showDetail.seasons?.filter(s =>
+          s.season_number > 0 && s.air_date && new Date(s.air_date) <= today
+        ) || [];
         enriched = {
           ...enriched,
           totalSeasons: showDetail.number_of_seasons,
           status: showDetail.status,
           nextAirDate: showDetail.next_episode_to_air?.air_date || null,
-          totalEpisodesPerSeason: showDetail.seasons
-            ?.filter(s => s.season_number > 0)
+          totalEpisodesPerSeason: airedSeasons
             .reduce((acc, s) => ({ ...acc, [`s${s.season_number}`]: s.episode_count }), {}),
+          seasonAirDates: (showDetail.seasons || [])
+            .filter(s => s.season_number > 0 && s.air_date)
+            .reduce((acc, s) => ({ ...acc, [`s${s.season_number}`]: s.air_date }), {}),
         };
       }
 

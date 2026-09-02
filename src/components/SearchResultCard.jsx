@@ -1,14 +1,13 @@
 // src/components/SearchResultCard.jsx
 // Card shown in search results (before adding to collection)
 import { posterUrl } from '../services/tmdb';
+import { getReleaseYear } from '../utils/date';
 import './SearchResultCard.css';
 
 export default function SearchResultCard({ item, onAdd, isAdded, isAdding }) {
   const isTV = item.media_type === 'tv';
   const title = isTV ? (item.name || item.original_name) : (item.title || item.original_title);
-  const year = isTV
-    ? (item.first_air_date ? new Date(item.first_air_date).getFullYear() : null)
-    : (item.release_date ? new Date(item.release_date).getFullYear() : null);
+  const year = getReleaseYear(isTV ? item.first_air_date : item.release_date);
   const poster = posterUrl(item.poster_path, 'w185');
 
   return (

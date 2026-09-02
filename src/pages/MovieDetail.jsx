@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 import { subscribeToItem, markMovieWatched } from '../services/collection';
 import { getMovie, posterUrl, backdropUrl } from '../services/tmdb';
+import { formatDate } from '../utils/date';
 import './MovieDetail.css';
 
 export default function MovieDetail() {
@@ -48,8 +49,6 @@ export default function MovieDetail() {
 
   const poster = posterUrl(item.posterPath, 'w342');
   const backdrop = backdropUrl(item.backdropPath);
-
-  const watchedAt = item.watchedAt?.toDate?.() || (item.watchedAt ? new Date(item.watchedAt) : null);
 
   const runtime = movieDetail?.runtime;
   const runtimeText = runtime ? `${Math.floor(runtime / 60)}h ${runtime % 60}m` : null;
@@ -102,9 +101,9 @@ export default function MovieDetail() {
               <div className="movie-watched-check">✅</div>
               <div>
                 <p className="movie-watched-label">You watched this!</p>
-                {watchedAt && (
+                {item.watchedAt && (
                   <p className="movie-watched-date">
-                    {watchedAt.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                    {formatDate(item.watchedAt, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                 )}
               </div>

@@ -2,8 +2,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
-import { subscribeToItem, toggleEpisodeWatched, markSeasonWatched, updateShowMetadata, calculateNextEpisode } from '../services/collection';
+import { subscribeToItem, toggleEpisodeWatched, markSeasonWatched, updateShowMetadata, calculateNextEpisode, syncShowMetadata } from '../services/collection';
 import { getTVShow, getTVSeason, posterUrl, backdropUrl } from '../services/tmdb';
+import { formatAirDate, formatNextAirDate } from '../utils/date';
 import './ShowDetail.css';
 
 export default function ShowDetail() {
@@ -38,20 +39,27 @@ export default function ShowDetail() {
       setShowDetail(detail);
       setLoadingDetail(false);
 
-      const totalEpisodesPerSeason = detail.seasons
-        ?.filter(s => s.season_number > 0)
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const airedSeasons = (detail.seasons || []).filter(s =>
+        s.season_number > 0 && s.air_date && new Date(s.air_date) <= today
+      );
+
+      const totalEpisodesPerSeason = airedSeasons
         .reduce((acc, s) => ({ ...acc, [`s${s.season_number}`]: s.episode_count }), {});
 
-      const updatedTotalEp = totalEpisodesPerSeason || item.totalEpisodesPerSeason || {};
-      const newNextEp = calculateNextEpisode(item.watchProgress || {}, detail.number_of_seasons, updatedTotalEp);
+      const seasonAirDates = (detail.seasons || [])
+        .filter(s => s.season_number > 0 && s.air_date)
+        .reduce((acc, s) => ({ ...acc, [`s${s.season_number}`]: s.air_date }), {});
 
       if (householdId) {
-        updateShowMetadata(householdId, id, {
-          nextAirDate: detail.next_episode_to_air?.air_date || null,
+        // syncShowMetadata also scrubs watchProgress for unaired seasons
+        syncShowMetadata(householdId, id, {
           status: detail.status,
           totalSeasons: detail.number_of_seasons,
-          totalEpisodesPerSeason: updatedTotalEp,
-          nextEpisode: newNextEp,
+          totalEpisodesPerSeason,
+          seasonAirDates,
+          nextAirDate: detail.next_episode_to_air?.air_date || null,
         }).catch(() => {});
       }
     }).catch(() => setLoadingDetail(false));
@@ -184,7 +192,7 @@ export default function ShowDetail() {
                 {' '}{showDetail.next_episode_to_air.name}
               </strong>
               <span className="text-muted text-sm">
-                {new Date(showDetail.next_episode_to_air.air_date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                {formatNextAirDate(showDetail.next_episode_to_air.air_date)}
               </span>
             </div>
           </div>
@@ -256,9 +264,7 @@ export default function ShowDetail() {
 }
 
 function EpisodeRow({ episode, isWatched, isLoading, onToggle }) {
-  const airDate = episode.air_date
-    ? new Date(episode.air_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    : null;
+  const airDate = formatAirDate(episode.air_date);
 
   return (
     <button

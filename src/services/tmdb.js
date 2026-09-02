@@ -1,5 +1,6 @@
 // src/services/tmdb.js
 // TMDB API client — wraps all API calls with caching and error handling
+import { getReleaseYear } from '../utils/date';
 
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMAGE_BASE = 'https://image.tmdb.org/t/p';
@@ -73,9 +74,7 @@ export function formatMediaItem(tmdbItem) {
     posterPath: tmdbItem.poster_path,
     backdropPath: tmdbItem.backdrop_path,
     overview: tmdbItem.overview,
-    releaseYear: isTV
-      ? (tmdbItem.first_air_date ? new Date(tmdbItem.first_air_date).getFullYear() : null)
-      : (tmdbItem.release_date ? new Date(tmdbItem.release_date).getFullYear() : null),
+    releaseYear: getReleaseYear(isTV ? tmdbItem.first_air_date : tmdbItem.release_date),
     rating: tmdbItem.vote_average ? Math.round(tmdbItem.vote_average * 10) / 10 : null,
   };
 }

@@ -1,11 +1,14 @@
 // src/pages/Home.jsx
+import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { posterUrl } from '../services/tmdb';
+import { toggleEpisodeWatched } from '../services/collection';
+import { parseDateString, formatAirDate } from '../utils/date';
 import './Home.css';
 
 export default function Home() {
-  const { auth: { profile }, collection: { shows, movies, watchedMovies, loading } } = useApp();
+  const { auth: { profile, user }, collection: { shows, movies, watchedMovies, loading }, toast } = useApp();
   const navigate = useNavigate();
 
   const firstName = profile?.displayName?.split(' ')[0] || 'there';
@@ -16,13 +19,15 @@ export default function Home() {
   // Shows with upcoming air dates or returning series status
   const upcoming = shows.filter(s => {
     if (s.nextAirDate) {
-      const airDate = s.nextAirDate?.toDate?.() || new Date(s.nextAirDate);
-      return airDate > new Date();
+      const airDate = parseDateString(s.nextAirDate);
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      return airDate && airDate >= startOfToday;
     }
     return s.status === 'Returning Series' || s.status === 'In Production' || s.status === 'Planned';
   }).sort((a, b) => {
-    const da = a.nextAirDate?.toDate?.() || (a.nextAirDate ? new Date(a.nextAirDate) : new Date('2099-01-01'));
-    const db = b.nextAirDate?.toDate?.() || (b.nextAirDate ? new Date(b.nextAirDate) : new Date('2099-01-01'));
+    const da = parseDateString(a.nextAirDate) || new Date('2099-01-01');
+    const db = parseDateString(b.nextAirDate) || new Date('2099-01-01');
     return da - db;
   });
 
@@ -86,7 +91,14 @@ export default function Home() {
           </div>
           <div className="next-watch-list">
             {nextToWatch.map(show => (
-              <NextWatchCard key={show.id} show={show} onClick={() => navigate(`/show/${show.id}`)} />
+              <NextWatchCard
+                key={show.id}
+                show={show}
+                onClick={() => navigate(`/show/${show.id}`)}
+                householdId={profile?.householdId}
+                userId={user?.uid}
+                toast={toast}
+              />
             ))}
           </div>
         </section>
@@ -134,19 +146,31 @@ export default function Home() {
   );
 }
 
-function NextWatchCard({ show, onClick }) {
+function NextWatchCard({ show, onClick, householdId, userId, toast }) {
+  const [marking, setMarking] = useState(false);
   const poster = posterUrl(show.posterPath, 'w185');
   const { season, episode } = show.nextEpisode;
-  const airDate = show.nextAirDate?.toDate?.() || (show.nextAirDate ? new Date(show.nextAirDate) : null);
-  const formattedNextAir = airDate
-    ? airDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
-    : null;
+  const formattedNextAir = formatAirDate(show.nextAirDate);
 
   const statusBadgeClass = show.status === 'Ended' || show.status === 'Canceled'
     ? 'badge-movie'
     : show.status === 'Returning Series'
     ? 'badge-returning'
     : 'badge-tv';
+
+  const handleMarkComplete = async (e) => {
+    e.stopPropagation();
+    if (!householdId || !userId || marking) return;
+    setMarking(true);
+    try {
+      await toggleEpisodeWatched(householdId, show.id, season, episode, true, userId);
+      toast?.success(`Marked S${season} E${episode} of "${show.title}" as watched! ✅`);
+    } catch {
+      toast?.error('Failed to mark episode. Try again.');
+    } finally {
+      setMarking(false);
+    }
+  };
 
   return (
     <button className="next-watch-card" onClick={onClick} id={`next-watch-${show.id}`}>
@@ -179,6 +203,18 @@ function NextWatchCard({ show, onClick }) {
             </span>
           ) : null}
         </div>
+        <button
+          id={`mark-complete-${show.id}`}
+          className="mark-complete-btn"
+          onClick={handleMarkComplete}
+          disabled={marking}
+          aria-label={`Mark S${season} E${episode} of ${show.title} as complete`}
+        >
+          {marking
+            ? <span className="spinner" style={{ width: 12, height: 12 }} />
+            : `✓ Mark S${season} E${episode} as complete`
+          }
+        </button>
       </div>
       <span className="next-watch-play">▶</span>
     </button>
@@ -187,8 +223,7 @@ function NextWatchCard({ show, onClick }) {
 
 function UpcomingCard({ show, onClick }) {
   const poster = posterUrl(show.posterPath, 'w185');
-  const airDate = show.nextAirDate?.toDate?.() || (show.nextAirDate ? new Date(show.nextAirDate) : null);
-  const formattedDate = airDate ? airDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : null;
+  const formattedDate = formatAirDate(show.nextAirDate);
   const nextEpInfo = show.nextEpisodeToAir;
 
   return (
